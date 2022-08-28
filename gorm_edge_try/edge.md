@@ -54,7 +54,7 @@ var cxk Cxk
 db.Preload("Chicken").First(&cxk)
 fmt.Printf("%#v", cxk)
 // 结果：main.Cxk{Id:0x1, Name:"cxk", Chicken:
-main.Chicken{Id:0x1, Name:"chicken", CxkId:0x1}}
+// main.Chicken{Id:0x1, Name:"chicken", CxkId:0x1}}
 ```
 ### 2. 对于一对多的关系的尝试
 一只cxk肯定不止拥有一只chicken，我们可以通过has_many的方式来实现一对多的关系。
@@ -112,9 +112,9 @@ var cxk Cxk
 db.Preload("Chickens").First(&cxk)
 fmt.Printf("%#v", cxk)
 // 结果：main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{
-main.Chicken{Id:0x1, Name:"chicken1", CxkId:0x1}, 
-main.Chicken{Id:0x2, Name:"chicken2", CxkId:0x1}, 
-main.Chicken{Id:0x3, Name:"chicken3", CxkId:0x1}}}
+// main.Chicken{Id:0x1, Name:"chicken1", CxkId:0x1}, 
+// main.Chicken{Id:0x2, Name:"chicken2", CxkId:0x1}, 
+// main.Chicken{Id:0x3, Name:"chicken3", CxkId:0x1}}}
 ```
 ### 3. 对于多对多的关系的尝试
 一只cxk肯定不止拥有一只chicken，一只chicken肯定不止属于一个cxk，我们可以通过many_to_many的方式来
@@ -182,15 +182,15 @@ var cxk Cxk
 db.Preload("Chickens").Where("id = ?", 1).First(&cxk)
 fmt.Printf("%#v", cxk)
 // 结果：main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{
-main.Chicken{Id:0x1, Name:"chicken1"}, 
-main.Chicken{Id:0x2, Name:"chicken2"}}}
+// main.Chicken{Id:0x1, Name:"chicken1"}, 
+// main.Chicken{Id:0x2, Name:"chicken2"}}}
 
 // 查询chicken1的所有cxk的信息
 var cxks []Cxk
 db.Preload("Chickens", "id in (1)").Find(&cxks) //预加载的条件是id in (1)
 fmt.Printf("%#v", cxks)
 //结果：[]main.Cxk{main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{
-main.Chicken{Id:0x1, Name:"chicken1"}}}, 
-main.Cxk{Id:0x2, Name:"cxk2", Chickens:[]main.Chicken{
-main.Chicken{Id:0x1, Name:"chicken1"}}}}
+// main.Chicken{Id:0x1, Name:"chicken1"}}}, 
+// main.Cxk{Id:0x2, Name:"cxk2", Chickens:[]main.Chicken{
+// main.Chicken{Id:0x1, Name:"chicken1"}}}}
 ```
