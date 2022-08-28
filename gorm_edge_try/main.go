@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func main() {
@@ -87,39 +88,40 @@ func main() {
 	//t.name = "test"
 	//
 	//fmt.Println(t)
-	db, err := gorm.Open(mysql.Open("root:123456@tcp(localhost:3306)/test1?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open("root:123456@tcp(localhost:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 	//err = db.AutoMigrate(&Language{}, &User{})
-	//if err != nil {
-	// return
-	//}
-	//db.Model(&Language{}).Create(&Language{
-	// Name: "language" + strconv.Itoa(0),
-	// Users: []User{
-	//  {
-	//   Name: "user" + strconv.Itoa(0),
-	//  },
-	//  {
-	//   Name: "user" + strconv.Itoa(1),
-	//  },
-	// },
-	//})
+	//	//if err != nil {
+	//	//	return
+	//	//}
+	//	//db.Model(&Language{}).Create(&Language{
+	//	//	Name: "language" + strconv.Itoa(0),
+	//	//	Users: []User{
+	//	//		{
+	//	//			Name: "user" + strconv.Itoa(0),
+	//	//		},
+	//	//		{
+	//	//			Name: "user" + strconv.Itoa(1),
+	//	//		},
+	//	//	},
+	//	//})
 
 	//var c []User
 	//sql := "SELECT u.id,u.name,u.created_at FROM  users AS u JOIN user_languages AS ul ON u.id = ul.user_id WHERE ul.language_id = ?"
 	//db.Raw(sql, 1).Scan(&c)
 	//var c []User
 	var l Language
-	err = db.Model(&User{}).Where("id = 0").Find(&l).Error
+	err = db.Preload(clause.Associations, "name not IN (?)", "user1").Find(&l).Error
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(l)
-	//for _, v := range c {
-	// fmt.Println(v.Model.CreatedAt)
-	//}
+	fmt.Println(l.Users)
+	for _, v := range l.Users {
+		fmt.Println(v.Name)
+	}
 
 }
 
