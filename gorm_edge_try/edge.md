@@ -21,7 +21,8 @@ func (Chicken) TableName() string {
 	return "chicken"
 }
 ```
-跳过连接数据库的过程，我们初始化完成cxk表以及chicken表后，添加一只cxk的信息，并且添加一只chicken的信息，我们可以在添加cxk的时候直接为其绑定一只chicken。
+跳过连接数据库的过程，我们初始化完成cxk表以及chicken表后，添加一只cxk的信息，并且添加一只chicken的信息
+我们可以在添加cxk的时候直接为其绑定一只chicken。
 ``` go
     err = db.AutoMigrate(&Cxk{}, &Chicken{})
     if err != nil {
@@ -52,7 +53,8 @@ main.Cxk{Id:0x1, Name:"cxk", Chicken:main.Chicken{Id:0x0, Name:"", CxkId:0x0}}
 var cxk Cxk
 db.Preload("Chicken").First(&cxk)
 fmt.Printf("%#v", cxk)
-// 结果：main.Cxk{Id:0x1, Name:"cxk", Chicken:main.Chicken{Id:0x1, Name:"chicken", CxkId:0x1}}
+// 结果：main.Cxk{Id:0x1, Name:"cxk", Chicken:
+main.Chicken{Id:0x1, Name:"chicken", CxkId:0x1}}
 ```
 ### 2. 对于一对多的关系的尝试
 一只cxk肯定不止拥有一只chicken，我们可以通过has_many的方式来实现一对多的关系。
@@ -74,7 +76,8 @@ func (Chicken) TableName() string {
     return "chicken"
 }
 ```
-如法炮制，我们初始化了一张cxk表和一张chicken表，关联关系是一对多的关系，关联关系的类型是has_many，关联关系的方向是has_many的方向。并为表初始化了一组数据。
+如法炮制，我们初始化了一张cxk表和一张chicken表，关联关系是一对多的关系，关联关系的类型是has_many，关联关系
+的方向是has_many的方向。并为表初始化了一组数据。
 ``` go
     err = db.AutoMigrate(&Cxk{}, &Chicken{})
     if err != nil {
@@ -108,10 +111,14 @@ func (Chicken) TableName() string {
 var cxk Cxk
 db.Preload("Chickens").First(&cxk)
 fmt.Printf("%#v", cxk)
-// 结果：main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{main.Chicken{Id:0x1, Name:"chicken1", CxkId:0x1}, main.Chicken{Id:0x2, Name:"chicken2", CxkId:0x1}, main.Chicken{Id:0x3, Name:"chicken3", CxkId:0x1}}}
+// 结果：main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{
+main.Chicken{Id:0x1, Name:"chicken1", CxkId:0x1}, 
+main.Chicken{Id:0x2, Name:"chicken2", CxkId:0x1}, 
+main.Chicken{Id:0x3, Name:"chicken3", CxkId:0x1}}}
 ```
 ### 3. 对于多对多的关系的尝试
-一只cxk肯定不止拥有一只chicken，一只chicken肯定不止属于一个cxk，我们可以通过many_to_many的方式来实现多对多的关系。
+一只cxk肯定不止拥有一只chicken，一只chicken肯定不止属于一个cxk，我们可以通过many_to_many的方式来
+实现多对多的关系。
 ``` go
 type Cxk struct {
 	Id       uint      `gorm:"primary_key"`
@@ -174,11 +181,16 @@ func (Chicken) TableName() string {
 var cxk Cxk
 db.Preload("Chickens").Where("id = ?", 1).First(&cxk)
 fmt.Printf("%#v", cxk)
-// 结果：main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{main.Chicken{Id:0x1, Name:"chicken1"}, main.Chicken{Id:0x2, Name:"chicken2"}}}
+// 结果：main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{
+main.Chicken{Id:0x1, Name:"chicken1"}, 
+main.Chicken{Id:0x2, Name:"chicken2"}}}
 
 // 查询chicken1的所有cxk的信息
 var cxks []Cxk
 db.Preload("Chickens", "id in (1)").Find(&cxks) //预加载的条件是id in (1)
 fmt.Printf("%#v", cxks)
-//结果：[]main.Cxk{main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{main.Chicken{Id:0x1, Name:"chicken1"}}}, main.Cxk{Id:0x2, Name:"cxk2", Chickens:[]main.Chicken{main.Chicken{Id:0x1, Name:"chicken1"}}}}
+//结果：[]main.Cxk{main.Cxk{Id:0x1, Name:"cxk", Chickens:[]main.Chicken{
+main.Chicken{Id:0x1, Name:"chicken1"}}}, 
+main.Cxk{Id:0x2, Name:"cxk2", Chickens:[]main.Chicken{
+main.Chicken{Id:0x1, Name:"chicken1"}}}}
 ```
