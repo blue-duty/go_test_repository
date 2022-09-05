@@ -12,40 +12,82 @@ func main() {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&Cxk{}, &Chicken{})
+	//dog1 := Dog{
+	//	Id:   2,
+	//	Name: "dog1",
+	//}
+
+	//db.Create(&dog1)
+
+	//err = db.Model(&dog1).Association("GrilGods").Append(&GrilGod{
+	//	Id:   3,
+	//	Name: "girl3",
+	//})
+
+	err = db.Model(&Dog{Id: 1}).Association("GrilGods").Delete(&GrilGod{Id: 2})
+
 	if err != nil {
-		return
+		fmt.Println(err)
 	}
 
-	db.Model(&Cxk{}).Create(&Cxk{
-		Id:   1,
-		Name: "cxk",
-		Chickens: []Chicken{
-			{
-				Id:   1,
-				Name: "chicken1",
-			},
-			{
-				Id:   2,
-				Name: "chicken2",
-			},
-		},
-	})
-	db.Model(&Cxk{}).Create(&Cxk{
-		Id:   2,
-		Name: "cxk2",
-		Chickens: []Chicken{
-			{
-				Id:   1,
-				Name: "chicken1",
-			},
-			{
-				Id:   4,
-				Name: "chicken4",
-			},
-		},
-	})
 	/*
+
+		err = db.AutoMigrate(&Dog{}, &GrilGod{})
+		if err != nil {
+			panic(err)
+		}
+
+		dog := Dog{
+			Id:   1,
+			Name: "dog",
+			GrilGods: []GrilGod{
+				{
+					Id:   1,
+					Name: "girl1",
+				},
+				{
+					Id:   2,
+					Name: "girl2",
+				},
+			},
+		}
+
+		err = db.Create(&dog).Error
+
+		err = db.AutoMigrate(&Cxk{}, &Chicken{})
+		if err != nil {
+			return
+		}
+
+		db.Model(&Cxk{}).Create(&Cxk{
+			Id:   1,
+			Name: "cxk",
+			Chickens: []Chicken{
+				{
+					Id:   1,
+					Name: "chicken1",
+				},
+				{
+					Id:   2,
+					Name: "chicken2",
+				},
+			},
+		})
+		db.Model(&Cxk{}).Create(&Cxk{
+			Id:   2,
+			Name: "cxk2",
+			Chickens: []Chicken{
+				{
+					Id:   1,
+					Name: "chicken1",
+				},
+				{
+					Id:   4,
+					Name: "chicken4",
+				},
+			},
+		})
+
 		db.Model(&Cxk{}).Create(&Cxk{
 			Id:   1,
 			Name: "cxk",
@@ -106,10 +148,46 @@ func main() {
 		var cxk Cxk
 		db.Preload("Chickens").Where("id = ?", 1).First(&cxk)
 		fmt.Printf("%#v", cxk)
+
+		var cxks []Cxk
+		db.Preload("Chickens", "id in (1)").Find(&cxks)
+		fmt.Printf("%#v", cxks)
+		db.Model(&Chicken{}).Create(&Chicken{
+			Id:   5,
+			Name: "chicken5",
+		})
+		db.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&Cxk{})
+		err = db.Model(&Cxk{}).Where("id = ?", 1).Association("Chickens").Append(&Chicken{
+			Id:   5,
+			Name: "chicken5",
+		})
+		err = db.Model(&Cxk{
+			Id: 1,
+		}).Association("Chickens").Clear()
+		err = db.Select("Chickens").Delete(&Cxk{
+			Id: 2,
+		}).Error
 	*/
-	var cxks []Cxk
-	db.Preload("Chickens", "id in (1)").Find(&cxks)
-	fmt.Printf("%#v", cxks)
+}
+
+type Dog struct {
+	Id       uint   `gorm:"primary_key"`
+	Name     string `gorm:"column:name"`
+	GrilGods []GrilGod
+}
+
+func (Dog) TableName() string {
+	return "dog"
+}
+
+type GrilGod struct {
+	Id    uint   `gorm:"primary_key"`
+	Name  string `gorm:"column:name"`
+	DogId uint
+}
+
+func (GrilGod) TableName() string {
+	return "girl_god"
 }
 
 /*
@@ -131,24 +209,7 @@ func (Chicken) TableName() string {
 	return "chicken"
 }
 
-type Cxk struct {
-	Id       uint   `gorm:"primary_key"`
-	Name     string `gorm:"column:name"`
-	Chickens []Chicken
-}
-func (Cxk) TableName() string {
-	return "cxk"
-}
 
-type Chicken struct {
-	Id    uint   `gorm:"primary_key"`
-	Name  string `gorm:"column:name"`
-	CxkId uint
-}
-func (Chicken) TableName() string {
-	return "chicken"
-}
-*/
 
 type Cxk struct {
 	Id       uint      `gorm:"primary_key"`
@@ -168,3 +229,4 @@ type Chicken struct {
 func (Chicken) TableName() string {
 	return "chicken"
 }
+*/

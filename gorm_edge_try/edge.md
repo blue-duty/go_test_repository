@@ -194,3 +194,26 @@ fmt.Printf("%#v", cxks)
 // main.Cxk{Id:0x2, Name:"cxk2", Chickens:[]main.Chicken{
 // main.Chicken{Id:0x1, Name:"chicken1"}}}}
 ```
+
+## 五、多对多的关系的删除
+gorm的删除操作是通过删除关联表的方式来实现的，我们可以通过删除关联表的方式来删除多对多的关系。
+``` go
+    // 删除cxk1和chicken1的关系
+    db.Model(&Cxk{}).Where("id = ?", 1).Association("Chickens").Delete(&Chicken{
+        Id: 1,
+    })
+    // 删除cxk1和chicken2的关系
+    db.Model(&Cxk{}).Where("id = ?", 1).Association("Chickens").Delete(&Chicken{
+        Id: 2,
+    })
+```
+以上的操作会删除cxk_chicken表中的一条记录，cxk1和chicken1的关系，但不会影响Cxk和Chicken表中的数据。
+
+### 也可以使用Select来删除多对多的关系
+``` go
+    // 删除cxk1和chicken1的关系
+    db.Model(&Cxk{}).Where("id = ?", 1).Select("Chickens").Delete()
+    // 删除cxk1和chicken2的关系
+    db.Model(&Cxk{}).Where("id = ?", 1).Select("Chickens").Delete()
+```
+但只能删除cxk1和chicken1和chicken2的关系以及Cxk表中的cxk1的数据，Chicken表中的数据不会被删除。
